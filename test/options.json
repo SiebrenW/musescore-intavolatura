@@ -1,0 +1,15 @@
+{
+ "cliPath": "@CLI@",
+ "source": 0,
+ "target": 2,
+ "startTick": 0,
+ "endTick": -1,
+ "runs": [
+  { "action": "realize", "target": 2, "mode": "minor", "preset": "theorbo-a-14", "fretSpan": 4, "candidates": 3, "keep": false },
+  { "action": "next", "tick": 0 },
+  { "action": "next", "tick": 3360 },
+  { "action": "realize", "target": 2, "mode": "minor", "preset": "theorbo-a-14", "fretSpan": 4, "candidates": 3, "keep": true },
+  { "action": "previous", "tick": 0 },
+  { "action": "previous", "tick": 0 }
+ ]
+}
