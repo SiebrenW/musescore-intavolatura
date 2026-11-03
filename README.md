@@ -1,19 +1,29 @@
 # Intavolatura for MuseScore
 
-A MuseScore 4 plugin that realizes figured bass into tablature for a theorbo, lute, archlute or baroque guitar: it reads a bass line with MuseScore's own figured bass and writes a playable fingering for every chord into a tablature staff and its linked standard staff. The fingerings come from the [Intavolatura](../intavolatura) app's engine (same chords, candidates and ranking), run as a small command-line program next to the plugin. Design and decisions: [PLAN.md](PLAN.md).
+A MuseScore 4 plugin that realizes figured bass into tablature for a theorbo, lute, archlute or baroque guitar: it reads a bass line with MuseScore's own figured bass and writes a playable fingering for every chord into a tablature staff and its linked standard staff. The fingerings come from the [Intavolatura](https://github.com/SiebrenW/intavolatura) app's engine (same chords, candidates and ranking), run as a small command-line program next to the plugin. Design and decisions: [PLAN.md](PLAN.md).
 
 Requires MuseScore Studio 4.7.5 or later. Tested on macOS.
 
 ## Install
 
-Needs Rust (`cargo`) and the `intavolatura` repository next to this one.
+From a [release](https://github.com/SiebrenW/musescore-intavolatura/releases): download the zip for your system (`macos`, `linux` or `windows`) and unzip it into MuseScore's plugins folder (by default `Documents/MuseScore4/Plugins`), so that it holds an `intavolatura` folder. The fingering engine in `intavolatura/bin` is not signed; on macOS, clear the download quarantine once:
+
+```sh
+xattr -dr com.apple.quarantine ~/Documents/MuseScore4/Plugins/intavolatura
+```
+
+From source: needs Rust (`cargo`) and the `intavolatura` repository next to this one (`INTAVOLATURA_REPO=<path>` if it is elsewhere).
 
 ```sh
 scripts/install.sh            # into ~/Documents/MuseScore4/Plugins
 scripts/install.sh <folder>   # or another plugins folder
 ```
 
-`INTAVOLATURA_REPO=<path>` points at the repository if it is elsewhere. Then enable *Realize figured bass*, *Next fingering* and *Previous fingering* in Plugins → Manage plugins.
+Then enable *Realize figured bass*, *Next fingering* and *Previous fingering* in Plugins → Manage plugins.
+
+## Releases
+
+`.github/workflows/build.yml` packs the plugin for macOS (universal), Linux and Windows (x86_64) on every push and pull request; pushing a tag `v*` also publishes a GitHub release with the zips. The CLI is built from `SiebrenW/intavolatura` at the commit in `INTAVOLATURA_REF`: bump it (to a pushed commit) to release a newer engine. `scripts/package.sh <platform> <version> <intavolatura-checkout>` builds the same zip locally.
 
 ## Prepare the score
 

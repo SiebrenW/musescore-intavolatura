@@ -1,0 +1,81 @@
+name: Build
+
+# Every push and pull request packs the plugin for macOS, Linux and Windows
+# (artifacts on the run). A tag such as v0.1.0 also publishes a GitHub
+# release with the zips. The CLI is built from SiebrenW/intavolatura at the
+# commit in INTAVOLATURA_REF.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos
+            os: macos-latest
+            targets: aarch64-apple-darwin,x86_64-apple-darwin
+          - platform: linux
+            os: ubuntu-22.04
+            targets: ""
+          - platform: windows
+            os: windows-latest
+            targets: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the pinned intavolatura commit
+        id: ref
+        shell: bash
+        run: echo "sha=$(tr -d '[:space:]' < INTAVOLATURA_REF)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: SiebrenW/intavolatura
+          ref: ${{ steps.ref.outputs.sha }}
+          path: intavolatura
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.targets }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: intavolatura
+      - name: Test the CLI
+        working-directory: intavolatura
+        run: cargo test --locked -p intavolatura-cli
+      - name: Package
+        shell: bash
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then version="${GITHUB_REF_NAME#v}"; else version="${GITHUB_SHA::7}"; fi
+          scripts/package.sh ${{ matrix.platform }} "$version" intavolatura dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: musescore-intavolatura-${{ matrix.platform }}
+          path: dist/*
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body: |
+            Requires MuseScore Studio 4.7.5 or later.
+
+            Download the zip for your system: `macos` (Apple silicon and Intel), `linux` (x86_64) or `windows` (x86_64). Unzip it into MuseScore's plugins folder (by default `Documents/MuseScore4/Plugins`), so that it holds an `intavolatura` folder. Then enable *Realize figured bass*, *Next fingering* and *Previous fingering* in Plugins → Manage plugins.
+
+            The fingering engine in `intavolatura/bin` is not signed. On macOS, clear the download quarantine once, else macOS stops it from running:
+
+                xattr -dr com.apple.quarantine ~/Documents/MuseScore4/Plugins/intavolatura
