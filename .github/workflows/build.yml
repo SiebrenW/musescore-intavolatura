@@ -30,12 +30,12 @@ jobs:
             targets: ""
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Read the pinned intavolatura commit
         id: ref
         shell: bash
         run: echo "sha=$(tr -d '[:space:]' < INTAVOLATURA_REF)" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: SiebrenW/intavolatura
           ref: ${{ steps.ref.outputs.sha }}
@@ -54,7 +54,7 @@ jobs:
         run: |
           if [ "$GITHUB_REF_TYPE" = tag ]; then version="${GITHUB_REF_NAME#v}"; else version="${GITHUB_SHA::7}"; fi
           scripts/package.sh ${{ matrix.platform }} "$version" intavolatura dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: musescore-intavolatura-${{ matrix.platform }}
           path: dist/*
@@ -64,11 +64,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           body: |
