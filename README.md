@@ -45,3 +45,7 @@ python3 test/show.py         # the report, readably
 ```
 
 The CLI's own tests live in the `intavolatura` repository: `cargo test -p intavolatura-cli`.
+
+## License
+
+Licensed under either of [Apache License 2.0](LICENSE-APACHE) or [BSD Zero Clause License](LICENSE-0BSD), at your option. Unless you state otherwise, any contribution you submit for inclusion is dual licensed as above, without any additional terms or conditions.

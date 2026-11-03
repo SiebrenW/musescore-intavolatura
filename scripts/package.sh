@@ -18,7 +18,7 @@ trap 'rm -rf "$stage"' EXIT
 
 dest="$stage/intavolatura"
 mkdir -p "$dest/bin"
-cp "$repo"/plugin/intavolatura/*.qml "$repo"/plugin/intavolatura/*.js "$dest/"
+cp "$repo"/plugin/intavolatura/*.qml "$repo"/plugin/intavolatura/*.js "$repo"/LICENSE-APACHE "$repo"/LICENSE-0BSD "$dest/"
 zipfile="$out/musescore-intavolatura-$version-$platform.zip"
 
 case "$platform" in
